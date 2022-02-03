@@ -3,7 +3,7 @@ const User = require('../models/User');
 const router= express.Router();
 
 // getting all users
-router.get('/user/', async (req, res) => {
+router.get('/user', async (req, res) => {
     try {
         const users= await User.find();
         res.json(users);
@@ -34,7 +34,7 @@ router.get('/user/:id', async (req, res) => {
 })
 
 // creating a new User
-router.post("user/", async (req, res) => {
+router.post("/user", async (req, res) => {
     try {
         const { name, email, password }= req.body;
 
@@ -50,7 +50,7 @@ router.post("user/", async (req, res) => {
 });
 
 // deleting a user by a specific id
-router.delete("user/:id", async (req, res) => {
+router.delete("/user/:id", async (req, res) => {
     try {
         const userId= req.params.id;
 
@@ -68,6 +68,33 @@ router.delete("user/:id", async (req, res) => {
     }
     catch(err) {
     res.status(500).send();
+    }
+});
+
+// update a user by a specific id
+router.put("/user/:id", async (req, res) => {
+    try {
+        const { name, email, password }= req.body;
+        const userId= req.params.id;
+
+        if (!userId)
+            return res.status(400).json({errorMessge: 'User id not given. Please contact the developer.'});
+
+        const existingUser= await User.findById(userId);
+
+        if (!existingUser)
+            return res.status(400).json({errorMessge: 'No user found with the specified id. Please contact the developer.'});
+
+        existingUser.name= name;
+        existingUser.email= email;
+        existingUser.password= password;
+
+        const savedUser= await existingUser.save();
+
+        res.json(savedUser);
+    }
+    catch(err) {
+        res.status(500).send();
     }
 });
 
