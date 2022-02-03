@@ -3,7 +3,7 @@ const User = require('../models/User');
 const router= express.Router();
 
 // getting all users
-router.get('/', async (req, res) => {
+router.get('/user/', async (req, res) => {
     try {
         const users= await User.find();
         res.json(users);
@@ -13,8 +13,28 @@ router.get('/', async (req, res) => {
     }
 });
 
+// getting a specific user by id
+router.get('/user/:id', async (req, res) => {
+    try {
+        const userId= req.params.id;
+
+        if (!userId)
+            return res.status(400).json({errorMessge: 'User is not given. Please contact the developer.'});
+
+        const existingUser= await User.findById(userId);
+
+        if (!existingUser)
+            return res.status(400).json({errorMessge: 'No user with the specified id. Please contact the developer.'});
+        
+        res.json(existingUser);
+    }
+    catch(err) {
+        res.status(500).send();
+    }
+})
+
 // creating a new User
-router.post("/", async (req, res) => {
+router.post("user/", async (req, res) => {
     try {
         const { name, email, password }= req.body;
 
@@ -30,7 +50,7 @@ router.post("/", async (req, res) => {
 });
 
 // deleting a user by a specific id
-router.delete("/:id", async (req, res) => {
+router.delete("user/:id", async (req, res) => {
     try {
         const userId= req.params.id;
 
